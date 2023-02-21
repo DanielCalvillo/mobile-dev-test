@@ -10,7 +10,6 @@ export default function DetailScreen( {navigation}: any) {
   const route = useRoute();
   const product: any = route?.params?.product
   const date = moment(product.createdAt).format("MMMM Do YYYY")
-  console.log(product, date)
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.welcome_container}>
@@ -23,8 +22,9 @@ export default function DetailScreen( {navigation}: any) {
       <Text style={styles.aquired_date}>Comprado el {date}</Text>
       <Text style={styles.sub_title}>Con esta compra acumulaste</Text>
       <Text style={styles.points_aquired}>{product.points} puntos</Text>
-  
-      <Button onPress={() => navigation.navigate('Home')}  text='Aceptar' widthFull />
+      <View style={styles.buttons}>
+        <Button onPress={() => navigation.navigate('Home')}  text='Aceptar' widthFull />
+      </View>
     </SafeAreaView>
   );
 }

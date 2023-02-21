@@ -18,10 +18,12 @@ export default function HomeScreen({ navigation }: Props) {
     points,
     myData, 
     updateMyData, 
-    get_redemption_products, 
-    get_not_redemption_products, 
-    ShowAllProducts, 
-    setShowAllProducts 
+    getRedemptionProducts, 
+    getNotRedemptionProducts, 
+    showAllProducts, 
+    setShowAllProducts,
+    error,
+    loading
   } = useContext(MyContext);
 
   useEffect(() => {
@@ -31,9 +33,9 @@ export default function HomeScreen({ navigation }: Props) {
   const handleGetProducts = async (isRedemption: boolean) => {
     setShowAllProducts(true);
     if (isRedemption) {
-       await get_redemption_products();
+       await getRedemptionProducts();
     } else {
-       await get_not_redemption_products();
+       await getNotRedemptionProducts();
     }
   };
   const handleGetAllProducts = async () => {
@@ -41,17 +43,20 @@ export default function HomeScreen({ navigation }: Props) {
     await updateMyData();
   };
 
-  // TODO: ortogonality on api requests and components<
 
-  
-  const productList = myData?.map((product: Product) => (
+  let productListContent = myData?.map((product: Product) => (
     <ProductCard 
       key={product.product}  
       product={product}
       onPress={() => navigation.navigate('Details', {product})}
     />
   ));
-  
+  if (loading) {
+    productListContent = <Text style={styles.title}>Cargando datos...</Text>
+  }
+  if (error) {
+    productListContent = <Text style={styles.title}>Error Obteniendo datos</Text>
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,10 +74,23 @@ export default function HomeScreen({ navigation }: Props) {
   
       <Text style={styles.sub_title}>TUS MOVIMIENTOS</Text>
       <View style={styles.products_container}>
-        {productList}
+        {productListContent}
       </View>
-      {!ShowAllProducts && <Button onPress={() => handleGetProducts(true)} text="Ganados" second_text="Canjeables"  secondOnPress={() => handleGetProducts(true)} />}
-      {ShowAllProducts && <Button widthFull onPress={handleGetAllProducts} text="Todos" />}
+      {!showAllProducts && (
+        <Button 
+          onPress={() => handleGetProducts(true)} 
+          text="Ganados" 
+          second_text="Canjeables"  
+          secondOnPress={() => handleGetProducts(true)} 
+        />
+      )}
+      {showAllProducts && ( 
+        <Button 
+          widthFull 
+          onPress={handleGetAllProducts} 
+          text="Todos" 
+        />
+      )}
       
     </SafeAreaView>
   );

@@ -1,38 +1,65 @@
 import { createContext, useState, useEffect } from 'react';
+import { getProducts } from './helpers/api'
 
 export const MyContext = createContext();
 
 export const MyContextProvider = ({ children }) => {
-    const [ShowAllProducts, setShowAllProducts ] = useState([]) 
+    const [showAllProducts, setShowAllProducts ] = useState([]) 
     const [points, setPoints] = useState(0)
-    const [myData, setMyData] = useState(null);
+    const [myData, setMyData] = useState([]);
+    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(null)
+    
     const updateMyData = async () => {
-        const response = await fetch('https://6222994f666291106a29f999.mockapi.io/api/v1/products');
-        const data = await response.json();
+      setLoading(true)
+      const { err, data} = await getProducts()
+      if(err) {
+        setError(err)
+        setLoading(false)
+      } else {
         setMyData(data);
-      };
-      get_not_redemption_products
-      const get_not_redemption_products = async () => {
-        const response = await fetch('https://6222994f666291106a29f999.mockapi.io/api/v1/products');
-        const data = await response.json();
-        const redemptionTrueList = data.filter(product => product.is_redemption === false);
-        console.log(redemptionTrueList)
+        setLoading(false)
+      }
+    };
+
+    const getNotRedemptionProducts = async () => {
+      setLoading(true)
+
+      const { err, data} = await getProducts()
+      if(err) {
+        setError(err)
+        setLoading(false)
+      } else {
+        const redemptionTrueList = data.filter(product => !product.is_redemption);
         setMyData(redemptionTrueList);
         setShowAllProducts(true)
-      };
-      const get_redemption_products = async () => {
-        const response = await fetch('https://6222994f666291106a29f999.mockapi.io/api/v1/products');
-        const data = await response.json();
-        const redemptionFalseList = data.filter(product => product.is_redemption === true);
+        setLoading(false)
+      }
+    };
 
+    const getRedemptionProducts = async () => {
+      setLoading(true)
+
+      const { err, data} = await getProducts()
+      if(err) {
+        setError(err)
+        setLoading(false)
+      } else {
+        const redemptionFalseList = data.filter(product => product.is_redemption);
         setMyData(redemptionFalseList);
         setShowAllProducts(true)
-      };
+        setLoading(false)
+      }
+    };
       
-      useEffect(() => {
-          const getPoints = async () => {
-            const response = await fetch('https://6222994f666291106a29f999.mockapi.io/api/v1/products');
-            const data = await response.json();
+    useEffect(() => {
+        const getPoints = async () => {
+          setLoading(true)
+          const { err, data} = await getProducts()
+          if(err) {
+            setError(err)
+            setLoading(false)
+          } else {
             const totalPointsWithoutRedemptions = data.reduce((acc, item) => {
                 if (!item.is_redemption) {
                   return acc + item.points;
@@ -40,19 +67,26 @@ export const MyContextProvider = ({ children }) => {
                 return acc;
               }, 0);
               setPoints(totalPointsWithoutRedemptions)
+              setLoading(false)
           }
-          const updateMyData = async () => {
-          const response = await fetch('https://6222994f666291106a29f999.mockapi.io/api/v1/products');
-          const data = await response.json();
-          setMyData(data);
-        };
-        updateMyData()
-        setShowAllProducts(false)
-        getPoints()
-        
+        }
+      updateMyData()
+      setShowAllProducts(false)
+      getPoints()
     }, [])
     return (
-      <MyContext.Provider value={{ myData, updateMyData, get_not_redemption_products, get_redemption_products, ShowAllProducts, setShowAllProducts, points }}>
+      <MyContext.Provider 
+        value={{
+          myData, 
+          updateMyData, 
+          getNotRedemptionProducts, 
+          getRedemptionProducts, 
+          showAllProducts, 
+          setShowAllProducts, 
+          points,
+          error,
+          loading
+        }}>
         {children}
       </MyContext.Provider>
     );

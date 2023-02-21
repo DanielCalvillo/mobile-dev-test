@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { withDecay } from 'react-native-reanimated';
 
 const styles = StyleSheet.create({
     container: {
@@ -88,6 +89,11 @@ const styles = StyleSheet.create({
       paddingVertical: '1rem',
       marginBottom: '2rem',
     },
+    buttons: {
+      marginHorizontal: '1rem',
+      marginTop: '3rem',
+      width: '92%'
+    }
   });
 
   export default styles
