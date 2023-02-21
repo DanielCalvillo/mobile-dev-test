@@ -3,7 +3,7 @@ import { createContext, useState, useEffect } from 'react';
 export const MyContext = createContext();
 
 export const MyContextProvider = ({ children }) => {
-    const [ShowAllProducts, setShowAllProducts ] = useState(false) 
+    const [ShowAllProducts, setShowAllProducts ] = useState([]) 
     const [points, setPoints] = useState(0)
     const [myData, setMyData] = useState(null);
     const updateMyData = async () => {
